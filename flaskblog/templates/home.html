@@ -7,9 +7,30 @@
             <div class="article-metadata">
                 <h5><a href="{{ url_for('user_posts', username=post.author.username ) }}" class="mr-2">{{ post.author.username }}</a></h5>
                 <h5><small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small></h5>
+                <!--<i class="fa-regular fa-thumbs-up"></i>-->
             </div>
             <h2><a href="{{ url_for('post', post_id=post.id) }}" class="article-title" style="font-size: 25px;">{{ post.title }}</a></h2>
             <p class="article-content">{{ post.content }}</p>
+        
+        
+            {{ post.likes|length }}
+            {% if user_id in post.likes|map(attribute="author")|list %}
+            <a href="/like-post/{{post.id}}"><i class="fas fa-thumbs-up"></i></a>
+            {% else %}
+            <a href="/like-post/{{post.id}}"><i class="far fa-thumbs-up"></i></a>
+            {% endif %} 
+            
+            <!--{{ post.likes|length }}
+            <a href="#" class="like-button" data-post-id="{{post.id}}">
+                {% if user_id in post.likes|map(attribute="author")|list %}
+                    <i class="fas fa-thumbs-up"></i>
+                {% else %}
+                    <i class="far fa-thumbs-up"></i>
+                {% endif %}
+            </a> -->
+            
+                
+
         </div>
     </article>
     {% endfor %}

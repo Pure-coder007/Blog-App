@@ -4,7 +4,7 @@ from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flaskblog import app, db, bcrypt, mail
 from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, RequestResetForm, ResetPasswordForm
-from flaskblog.models import User, Post
+from flaskblog.models import User, Post, Like, Comment
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 
@@ -232,3 +232,22 @@ def reset_token(token):
         flash('You password has been updated! You are now able to log in', 'success')
         return redirect(url_for('login'))
     return render_template('reset_token.html', title='Reset Password', form=form)
+
+
+
+@app.route('/like-post/<post_id>', methods=['GET'])
+@login_required
+def like(post_id):
+    post = Post.query.filter_by(id=post_id)
+    like = Like.query.filter_by(author=current_user.id, post_id=post_id).first()
+    if not post:
+        flash('Post does not exist', 'error')
+    elif like:
+        db.session.delete(like)
+        db.session.commit()
+    else:
+        like = Like(author=current_user.id, post_id=post_id)
+        db.session.add(like)
+        db.session.commit()
+    return redirect(url_for('home', post_id=post_id))
+    
