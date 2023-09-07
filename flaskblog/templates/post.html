@@ -15,6 +15,14 @@
             </div>
             <h2 class="article-title">{{ post.title }}</h2>
             <p class="article-content">{{ post.content }}</p>
+            
+            {{ post.likes|length }}
+            {% if user_id in post.likes|map(attribute="author")|list %}
+            <a href="/like-post/{{post.id}}"><i class="fas fa-thumbs-up"></i></a>
+            {% else %}
+            <a href="/like-post/{{post.id}}"><i class="far fa-thumbs-up"></i></a>
+            {% endif %} 
+            
         </div>
     </article>
 

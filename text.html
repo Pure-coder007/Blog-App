@@ -1,1 +1,20 @@
-Lorem ipsum, dolor sit amet consectetur adipisicing elit. Mollitia sint quisquam ad, totam saepe atque, earum quis ipsam aut expedita quo, fuga commodi neque voluptates ut dolorem officiis illo recusandae. Officia ut nemo dolorem provident quo reiciendis molestias reprehenderit architecto illo ipsam quisquam pariatur, sunt minima, laboriosam quidem quam, vel labore similique et delectus deleniti impedit! Obcaecati laboriosam in, odit illum temporibus, voluptatem error, nam earum natus quasi doloribus accusamus.
+<div class="collapse" id="comments-{{post.id}}">
+    <div class="card">
+        <div class="card-body" id="comments-expanded-{{post.id}}">
+            
+            {% for comment in post.comments %}
+                <div class="d-flex justify-content-between align-items-center" >
+                    <div>
+                        <a href="/posts/{{comment.user.username}}">{{comment.user.username}}</a>: {{comment.text}}
+                    <div>
+                    </div>
+                        <small class="text-muted">
+                            {{comment.date}}
+                        </small>
+                    </div>
+                </div>
+            {% endfor %}
+                
+        </div>
+    </div>
+</div>

@@ -251,3 +251,42 @@ def like(post_id):
         db.session.commit()
     return redirect(url_for('home', post_id=post_id))
     
+    
+@app.route("/create-comment/<int:post_id>", methods=['POST'])
+@login_required 
+def create_comment(post_id):
+    text = request.form.get('text')
+    
+    if not text:
+        flash('Comment cannot be empty.', 'danger')
+        return redirect(url_for('home'))
+    
+    post = Post.query.get(post_id)
+    
+    if not post:
+        flash('Post does not exist.', 'error')
+        return redirect(url_for('home'))
+    
+    comment = Comment(text=text, author=current_user.id, post_id=post_id)
+    db.session.add(comment)
+    db.session.commit()
+    
+    flash('Comment added successfully!', 'success')
+    return redirect(url_for('home'))
+
+
+@app.route('/delete-comment/<int:comment_id>', methods=['POST'])
+@login_required
+def delete_comment(comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    
+    # Check if current user is the comment author or the post creator
+    # if current_user.id == comment.the_user or current_user.id == comment.post.author:
+
+    db.session.delete(comment)
+    db.session.commit()
+    flash('Comment deleted.', 'success')
+    # else:
+    #     flash('You do not have the permission to delete this comment.', 'danger')
+    
+    return redirect(url_for('home')) # Redirect to the appropriate view.

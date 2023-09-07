@@ -1,6 +1,6 @@
 from datetime import datetime
 # from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from itsdangerous.url_safe import URLSafeTimedSerializer as Serializer
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flaskblog import db, login_manager, app
 from flask_login import UserMixin
 from sqlalchemy.sql import func
@@ -55,6 +55,7 @@ class Post(db.Model):
     user_id = db.Column(db.Integer,  db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
     comments = db.relationship('Comment', backref='comment_post', lazy=True, passive_deletes=True)
     likes = db.relationship('Like', backref='like_post', lazy=True, passive_deletes=True)
+    user = db.relationship('User', backref='user_post', lazy=True, passive_deletes=True)
     
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
@@ -66,6 +67,7 @@ class Comment(db.Model):
     date_created = db.Column(db.DateTime(timezone=True), default=func.now())
     author = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)  # Corrected ForeignKey
     post_id = db.Column(db.Integer, db.ForeignKey('post.id', ondelete= 'CASCADE'), nullable=False)
+    the_user = db.relationship('User', backref='user_comment', lazy=True, passive_deletes=True)
 
     
     
@@ -74,3 +76,5 @@ class Like(db.Model):
     date_created = db.Column(db.DateTime(timezone=True), default=func.now())
     author = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)  # Corrected ForeignKey
     post_id = db.Column(db.Integer, db.ForeignKey('post.id', ondelete= 'CASCADE'), nullable=False)
+
+
