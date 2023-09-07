@@ -15,7 +15,7 @@
             </div>
             <h2 class="article-title">{{ post.title }}</h2>
             <p class="article-content">{{ post.content }}</p>
-            
+
             {{ post.likes|length }}
             {% if user_id in post.likes|map(attribute="author")|list %}
             <a href="/like-post/{{post.id}}"><i class="fas fa-thumbs-up"></i></a>
@@ -23,6 +23,64 @@
             <a href="/like-post/{{post.id}}"><i class="far fa-thumbs-up"></i></a>
             {% endif %} 
             
+            
+            <div class="collapse" id="comments-{{post.id}}">
+                <div class="card">
+                    <div class="card-body" id="comments-expanded-{{post.id}}">
+                        
+                        {% for comment in post.comments %}
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <a href="{{ url_for('user_posts', username=comment.the_user.username ) }}">{{comment.the_user.username}}</a>: {{comment.text}}
+                                </div>
+                            <br>
+                            <br>
+                                <div>
+                                    <small class="text-muted">
+                                        {{comment.date_created}}
+                                    </small>
+                                </div>
+                            </div>
+            
+            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <a href="{{ url_for('user_posts', username=comment.the_user.username ) }}">{{comment.the_user.username}}</a>: {{comment.text}}
+                                </div>
+                                <br>
+                                <br>
+                                <div class="d-flex align-items-center">
+                                    <small class="text-muted">
+                                        {{comment.date_created}}
+                                    </small>
+                                    <!-- Check if current user is the comment author or the post creator -->
+                                    {% if current_user.id == comment.the_user.id or current_user.id == post.user.id %}
+                                        <form method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}" style="margin-left: 10px;">
+                                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                            
+                    </div>
+                </div>
+            </div>
+            <p class="card-text">
+                {% if post.comments|length > 0 %}
+                <!-- Modified the below anchor tag to include 'data-bs-target' attribute -->
+                <a data-bs-toggle="collapse" href="#comments-{{post.id}}" role="button">
+                    <small>View {{post.comments|length}} Comments</small>
+                </a>
+                {% else %}
+                <small class="text-muted">No Comments</small>
+                {% endif %}
+            </p>
+            <form class="input-group mb-3 mt-3" method="POST" action="/create-comment/{{post.id}}">
+                <input type="text" id="text" name="text" class="form-control" placeholder="Comment..." />
+                <button type="submit" class="btn btn-primary">Comment</button>
+            </form>
+
         </div>
     </article>
 
