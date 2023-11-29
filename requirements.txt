@@ -25,6 +25,7 @@ SQLAlchemy
 svgwrite
 Tree
 typing_extensions
+gunicorn
 urllib3
 Werkzeug
 WTForms
