@@ -19,6 +19,17 @@ db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
+import cloudinary
+import cloudinary.uploader
+
+cloudinary.config( 
+  cloud_name = "dng3auwzo", 
+  api_key = "843925716127938", 
+  api_secret = "kat3iZZxfjJvD1rQhiensWv0GSU" 
+)
+
+
+
 # Setting a message for a user wanting to access the account page without logging in first
 login_manager.login_message_category = 'info'
 app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
@@ -30,6 +41,7 @@ mail = Mail(app)
 
 
 from flaskblog import routes
+from flaskblog.models import User, Post, Comment, Like
 
 # os.environ.get("EMAIL_USER"), os.environ.get("EMAIL_PASS")
 

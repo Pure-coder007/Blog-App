@@ -2,11 +2,13 @@ import os
 import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
-from flaskblog import app, db, bcrypt, mail
+from flaskblog import app, db, bcrypt, mail, cloudinary
 from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, RequestResetForm, ResetPasswordForm
 from flaskblog.models import User, Post, Like, Comment
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
+
+
 
 
 # with app.app_context():
@@ -22,7 +24,7 @@ from flask_mail import Message
 def home():
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=4)
-    return render_template("home.html", posts=posts)
+    return render_template("home.html", posts=posts, )
 
 
 
@@ -88,7 +90,7 @@ def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext
-    picture_path = os.path.join(app.root_path, 'static/images', picture_fn)
+    picture_path = os.path.join(app.root_path, 'static/profile pics', picture_fn)
     
     # Resizing the image file of our profile picture 
     output_size = (125, 125)
@@ -121,7 +123,7 @@ def account():
         form.username.data = current_user.username
         form.email.data = current_user.email
 # Setting a profile picture
-    image_file = url_for('static', filename='images/' + current_user.image_file)
+    image_file = url_for('static', filename='profile pics/' + current_user.image_file)
     return render_template('account.html',
                             title='Account', image_file=image_file, form=form)
     
@@ -131,13 +133,34 @@ def account():
 @login_required
 def new_post():
     form = PostForm()
+    image_url = None
+
     if form.validate_on_submit():
-        post = Post(title=form.title.data, content=form.content.data, author=current_user)
-        db.session.add(post)
-        db.session.commit()
-        flash('Your post has been created', 'success')
-        return redirect(url_for('home'))
-    return render_template('create_post.html', title='New Post', form=form, legend='New Post')
+        try:
+            # Attempt to upload the image to Cloudinary
+            if 'image' in request.files and request.files['image']:
+                image = request.files['image']
+                upload_result = cloudinary.uploader.upload(image)
+                image_url = upload_result.get('secure_url')
+
+            # Create a new post with the provided data
+            post = Post(
+                title=form.title.data,
+                content=form.content.data,
+                author=current_user,
+                image_url=image_url
+            )
+
+            db.session.add(post)
+            db.session.commit()
+
+            flash('Your post has been created', 'success')
+            return redirect(url_for('home'))
+
+        except Exception as e:
+            flash(f"Error creating post: {str(e)}", 'error')
+
+    return render_template('create_post.html', title='New Post', form=form, legend='New Post', image_url=image_url)
 
 
 # Getting all posts or error if no post is found
@@ -260,19 +283,25 @@ def create_comment(post_id):
     if not text:
         flash('Comment cannot be empty.', 'danger')
         return redirect(url_for('home'))
+    else:
+        post = Post.query.filter_by(id = post_id)
     
-    post = Post.query.get(post_id)
-    
-    if not post:
-        flash('Post does not exist.', 'error')
+        if post:
+            comment = Comment(text=text, author=current_user.id, post_id=post_id)
+            db.session.add(comment)
+            db.session.commit()
+            flash('Comment added successfully!', 'success')
+            return redirect(url_for('home'))
+        else: 
+            flash('Post does not exist.', 'error')
+            
         return redirect(url_for('home'))
     
-    comment = Comment(text=text, author=current_user.id, post_id=post_id)
-    db.session.add(comment)
-    db.session.commit()
+    # comment = Comment(text=text, author=current_user.id, post_id=post_id)
     
-    flash('Comment added successfully!', 'success')
-    return redirect(url_for('home'))
+    
+
+
 
 
 @app.route('/delete-comment/<int:comment_id>', methods=['POST'])

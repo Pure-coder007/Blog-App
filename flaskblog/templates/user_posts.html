@@ -1,9 +1,9 @@
 {% extends 'layout.html' %}
 {% block content %}
-    <h1 class="mb-3">Posts by {{ user.username }} ({{ posts.total }})</h1>
+    <!-- <h1 class="mb-3">Posts by {{ user.username }} ({{ posts.total }})</h1> -->
     {% for post in posts.items %}
     <article class="media content-section">
-        <img src="{{ url_for('static', filename='images/' + post.author.image_file) }}" alt="" class="rounded-circle article-img">
+        <!-- <img src="{{ url_for('static', filename='images/' + post.author.image_file) }}" alt="" class="rounded-circle article-img"> -->
         <div class="media-body">
             <div class="article-metadata">
                 <h5><a href="{{ url_for('user_posts', username=post.author.username ) }}" class="mr-2">{{ post.author.username }}</a></h5>
@@ -11,6 +11,11 @@
             </div>
             <h2><a href="{{ url_for('post', post_id=post.id) }}" class="article-title" style="font-size: 25px;">{{ post.title }}</a></h2>
             <p class="article-content">{{ post.content }}</p>
+
+            {% if post.image_url %}
+            <img src="{{ post.image_url }}" alt="Image" class="img-fluid">
+            {% endif %}
+           
         </div>
     </article>
     {% endfor %}

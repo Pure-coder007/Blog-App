@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block content %}
     <article class="media content-section">
-        <img src="{{ url_for('static', filename='images/' + post.author.image_file) }}" alt="" class="rounded-circle article-img">
+        <!-- <img src="{{ url_for('static', filename='images/' + post.author.image_file) }}" alt="" class="rounded-circle article-img"> -->
         <div class="media-body">
             <div class="article-metadata">
                 <a href="{{ url_for('user_posts', username=post.author.username ) }}" class="mr-2">{{ post.author.username }}</a>
@@ -13,14 +13,22 @@
                     </div>
                 {% endif %}
             </div>
-            <h2 class="article-title">{{ post.title }}</h2>
+            <h5 class="article-title">{{ post.title }}</h5>
             <p class="article-content">{{ post.content }}</p>
 
-            {{ post.likes|length }}
-            {% if user_id in post.likes|map(attribute="author")|list %}
-            <a href="/like-post/{{post.id}}"><i class="fas fa-thumbs-up"></i></a>
+            {% if post.image_url %}
+            <img src="{{ post.image_url }}" alt="Image" class="img-fluid">
+            {% endif %}
+           
+            {% if post.likes|length > 1 %}
+            <span id="likes-count-{{post.id}}">{{ post.likes|length }} likes</span>
             {% else %}
-            <a href="/like-post/{{post.id}}"><i class="far fa-thumbs-up"></i></a>
+            <span id="likes-count-{{post.id}}">{{ post.likes|length }} like</span>
+            {% endif %}
+            {% if user_id in post.likes|map(attribute="author")|list %}
+            <i class="fas fa-thumbs-up" id="like-button-{{post.id}}" onclick="like({{post.id}})"></i>
+            {% else %}
+            <i class="far fa-thumbs-up" id="like-button-{{post.id}}" onclick="like({{post.id}})"></i>
             {% endif %} 
             
             
@@ -30,15 +38,14 @@
                         
                         {% for comment in post.comments %}
                             <div class="d-flex justify-content-between align-items-center">
-                                <div>
+                                <!-- <div>
                                     <a href="{{ url_for('user_posts', username=comment.the_user.username ) }}">{{comment.the_user.username}}</a>: {{comment.text}}
-                                </div>
-                            <br>
+                                </div> -->
                             <br>
                                 <div>
-                                    <small class="text-muted">
+                                    <!-- <small class="text-muted">
                                         {{comment.date_created}}
-                                    </small>
+                                    </small> -->
                                 </div>
                             </div>
             
@@ -47,8 +54,7 @@
                                 <div>
                                     <a href="{{ url_for('user_posts', username=comment.the_user.username ) }}">{{comment.the_user.username}}</a>: {{comment.text}}
                                 </div>
-                                <br>
-                                <br>
+                                
                                 <div class="d-flex align-items-center">
                                     <small class="text-muted">
                                         {{comment.date_created}}
@@ -66,6 +72,8 @@
                     </div>
                 </div>
             </div>
+            
+           
             <p class="card-text">
                 {% if post.comments|length > 0 %}
                 <!-- Modified the below anchor tag to include 'data-bs-target' attribute -->

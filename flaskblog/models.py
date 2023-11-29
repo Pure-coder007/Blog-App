@@ -1,6 +1,6 @@
 from datetime import datetime
 # from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous.url_safe import URLSafeTimedSerializer as Serializer
 from flaskblog import db, login_manager, app
 from flask_login import UserMixin
 from sqlalchemy.sql import func
@@ -18,8 +18,8 @@ class User(db.Model, UserMixin):
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
     password = db.Column(db.String(60), nullable=False)
     posts = db.relationship('Post', backref='author', lazy=True)
-    comments = db.relationship('Comment', backref='comment_author', lazy=True, passive_deletes=True)
-    likes = db.relationship('Like', backref='like_author', lazy=True, passive_deletes=True)
+    comments = db.relationship('Comment', backref='user', lazy=True, passive_deletes=True)
+    likes = db.relationship('Like', backref='user', lazy=True, passive_deletes=True)
     
 # Sending the token for the reset of password which lasts 30 minutes
     def get_reset_token(self, expires_sec=1800):
@@ -53,8 +53,9 @@ class Post(db.Model):
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     content = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer,  db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    comments = db.relationship('Comment', backref='comment_post', lazy=True, passive_deletes=True)
-    likes = db.relationship('Like', backref='like_post', lazy=True, passive_deletes=True)
+    image_url = db.Column(db.String(500), nullable=True)
+    comments = db.relationship('Comment', backref='post', lazy=True, passive_deletes=True)
+    likes = db.relationship('Like', backref='post', lazy=True, passive_deletes=True)
     user = db.relationship('User', backref='user_post', lazy=True, passive_deletes=True)
     
     def __repr__(self):
