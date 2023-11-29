@@ -1,18 +1,18 @@
 {% extends 'layout.html' %}
 {% block content %}    
-    <div class="content-section">
+    <div class="content-section" style="font-size: 15px;">
         <div class="media">
             <img src="{{ image_file }}" alt="" class="rounded-circle account-img">
             <div class="media-body">
-                <p class="account-heading" style="font-size: 30px; color:blue; margin-top: 10px; font-weight:light;">{{ current_user.username }}</p>
-                <p class="text-secondary">{{ current_user.email }}</p>
+                <p class="account-heading" style="font-size: 15px; color:rgb(118, 118, 238); margin-top: 10px; font-weight:light;">{{ current_user.username }}</p>
+                <p class="text-secondary" style="font-size: 15px;">{{ current_user.email }}</p>
             </div>
         </div>
         
                 <form action="" method="POST" enctype="multipart/form-data">
                     {{ form.hidden_tag() }}
                         <fieldset class="form-group">
-                            <legend class="border-bottom mb-4">Account Info</legend>
+                            <legend class="border-bottom mb-4" style="font-size: 15px;">Account Info</legend>
 
                             <!--Creating the username field and also checking for errors-->
                                 <div class="form-group">
